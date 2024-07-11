@@ -13,7 +13,7 @@ const SplashScreen = () => {
                 <Text className="text-gray-700 mb-4">Donate & Save a life today</Text>
                 <Image source={require('../assets/splash_screen_female.jpeg')} className="w-72 h-72 rounded-lg mb-8"/>
                 <TouchableOpacity className="bg-red-500 w-80 py-4 rounded-lg mb-4"
-                onPress={() => navigation.navigate('Login')}>
+                onPress={() => navigation.navigate('HomePage')}>
                     <Text className="text-center text-lg text-white">Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="bg-gray-500 w-80 py-4 rounded-lg mb-4"
