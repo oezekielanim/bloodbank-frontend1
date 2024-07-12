@@ -3,29 +3,25 @@ import { View, SafeAreaView, Text, TouchableOpacity, Image,TextInput,StyleSheet,
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 
-const LoginScreen = () =>{
+
+const SignUpPage = () =>{
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSignIn = () => {
-        // Handle sign in logic here
-        Alert.alert('Login', `Email: ${email}\nPassword: ${password}`);
-      };
-  
+   
     return(
         <SafeAreaView className="flex-1 justify-center items-center bg-white">
-           <View className="items-center">
+             <View className="items-center">
                 {/* Header */}
                 <Image source={require('../assets/logo.png')} className="mb-5"/>
-                <Text className="text-red-500 text-xl font-bold mb-2">Welcome Back😊</Text>
-                <Text className="text-gray-700 mb-2">Enter your credentials to log in</Text>
+                <Text className="text-red-500 text-xl font-bold mb-2">Create your account</Text>
+                <Text className="text-gray-700 mb-2">Register now to create new account</Text>
 
                 {/* Login Form */}
                 <View className="flex-1">
                     <View className="mt-4">
                         <View className="flex-col m-4">
-                        <Text style={styles.label}>Email address</Text>
                         <TextInput
                             style={styles.input}
                             className="w-80 "
@@ -39,14 +35,38 @@ const LoginScreen = () =>{
                             required
                         />
                         </View>
+
+                        <View className="flex-col m-4">
+                        <TextInput
+                            style={styles.input}
+                            className="w-80 "
+                            placeholder="Username"
+                            keyboardType="name"
+                            autoCapitalize="none"
+                            autoCompleteType="name"
+                            textContentType="name"
+                            value={email}
+                            onChangeText={setEmail}
+                            required
+                        />
+                        </View>
+
+                        <View className="flex-col m-4">
+                        <TextInput
+                            style={styles.input}
+                            className="w-80 "
+                            placeholder="Phone"
+                            keyboardType="name"
+                            autoCapitalize="none"
+                            autoCompleteType="name"
+                            textContentType="name"
+                            value={email}
+                            onChangeText={setEmail}
+                            required
+                        />
+                        </View>
                         
                         <View className="flex-col m-4">
-                        <View style={styles.passwordHeader}>
-                            <Text style={styles.label}>Password</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('Forgot Password', 'Password reset link will be sent to your email.')}>
-                            <Text style={styles.forgotPassword}>Forgot password?</Text>
-                            </TouchableOpacity>
-                        </View>
                         <TextInput
                             style={styles.input}
                             className="w-80"
@@ -60,20 +80,34 @@ const LoginScreen = () =>{
                             required
                         />
                         </View>
+
+                        <View className="flex-col m-4">
+                        <TextInput
+                            style={styles.input}
+                            className="w-80"
+                            placeholder="Confirm Password"
+                            secureTextEntry
+                            autoCapitalize="none"
+                            autoCompleteType="password"
+                            textContentType="password"
+                            value={password}
+                            onChangeText={setPassword}
+                            required
+                        />
+                        </View>
                     </View>
                     {/* Login Button */}
                     <TouchableOpacity className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4"
-                    onPress={() => navigation.navigate('HomePage')}>
-                        <Text className="text-center text-lg text-white">Login</Text>
+                    onPress={() => navigation.navigate('LoginScreen')}>
+                        <Text className="text-center text-lg text-white">Sign up</Text>
                     </TouchableOpacity>
                 </View>
             </View>
 
+
         </SafeAreaView>
     );
 };
-
-
 const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -128,4 +162,4 @@ const styles = StyleSheet.create({
     },
   });
 
-export default LoginScreen;
+export default SignUpPage;

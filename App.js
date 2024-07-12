@@ -5,6 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from './screens/SplashScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomePage from './screens/HomePage';
+import SignUpPage from './screens/SignUpPage';
+import DonatePage from './screens/DonatePage';
+import RequestPage from './screens/RequestPage';
 
 const Stack = createStackNavigator();
 
@@ -13,8 +16,16 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false}}/>
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false}}/>
+        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false}}/>
         <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false}}/>
+        <Stack.Screen name="SignUpPage" component={SignUpPage} options={{ headerShown:false}}/>
+        <Stack.Screen name="DonatePage" component={DonatePage} options={{ headerShown:false}}/>
+        <Stack.Screen name="RequestPage" component={RequestPage} options={{
+          title : 'SUBMIT BLOOD REQUEST',
+          headerTitleStyle: {
+            color: 'red'
+          }
+        }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
