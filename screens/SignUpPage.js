@@ -1,110 +1,146 @@
 import React from "react";
-import { View, SafeAreaView, Text, TouchableOpacity, Image,TextInput,StyleSheet,Alert } from 'react-native';
+import { View, SafeAreaView,KeyboardAvoidingView,Platform, Text, TouchableOpacity, Image,StyleSheet,Alert, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, UserRef } from "../config/firebase";
+import { addDoc } from "firebase/firestore";
+import { Formik } from "formik";
+import TextInputComponent from "../components/textInput";
+import { sizes } from "../constants";
 
 
-const SignUpPage = () =>{
-    const navigation = useNavigation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const SignUpPage = ({navigation}) =>{
+   // const navigation = useNavigation();
 
+  
+    const [loading,setLoading] = useState(false)
+const signUp = async (email,password,FullName,phoneNumber)=>{
+setLoading(true)
+try {
+  const user = await createUserWithEmailAndPassword(auth,email,password)
+  if(user){
+    await addDoc(UserRef,{
+      id:Math.ceil(Math.random()*100000),
+      email:email,
+      FullName:FullName,
+      phoneNumber:phoneNumber
+    })
+
+  }
+  console.log("Success")
+  //use toast
+  
+  
+  //navigate to main
+} catch (error) {
+  console.log(error)
+}finally{
+setLoading(false)
+}
+navigation.navigate("LoginScreen")
+}
    
     return(
-        <SafeAreaView className="flex-1 justify-center items-center bg-white">
-             <View className="items-center">
-                {/* Header */}
+        <SafeAreaView style={{flex:1,width:sizes.screenWidth,flexDirection:"column"}}>
+          <KeyboardAvoidingView style={{height:"100%"}}    behavior="padding" keyboardVerticalOffset={Platform.OS === "ios"?20 : 0}>
+  
+            <ScrollView contentContainerStyle={{flexDirection:"column",justifyContent:"center",alignItems:"center"}} style={{minHeight:"100%"}}>
+              
                 <Image source={require('../assets/logo.png')} className="mb-5"/>
                 <Text className="text-red-500 text-xl font-bold mb-2">Create your account</Text>
                 <Text className="text-gray-700 mb-2">Register now to create new account</Text>
 
                 {/* Login Form */}
-                <View className="flex-1">
-                    <View className="mt-4">
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoCompleteType="email"
-                            textContentType="emailAddress"
-                            value={email}
-                            onChangeText={setEmail}
-                            required
-                        />
-                        </View>
+                <Formik
 
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Username"
-                            keyboardType="name"
-                            autoCapitalize="none"
-                            autoCompleteType="name"
-                            textContentType="name"
-                            value={email}
-                            onChangeText={setEmail}
-                            required
-                        />
-                        </View>
+                
+        initialValues={{
+          email: '',
+          FullName:"",
+          password: '',
+          phoneNumber:"",
+       
+        }}
+        onSubmit={async (values, { resetForm }) => {
+          signUp(values.email,values.password,values.FullName,values.phoneNumber)
+        resetForm()
+             }}
+             //create a validation schema
+        >
+          {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          errors,
+          values,
+          touched,
+          setFieldValue,
+        }) => (
+        
+          <View style={{width:sizes.screenWidth,paddingHorizontal:15}}>
+<TextInputComponent
+              label={'Email'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'email'}
+              errors={errors}
+              touched={touched}
+            />
+            <TextInputComponent
+              label={'Password'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'password'}
+              errors={errors}
+              type="password"
+              touched={touched}
+            />
 
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Phone"
-                            keyboardType="name"
-                            autoCapitalize="none"
-                            autoCompleteType="name"
-                            textContentType="name"
-                            value={email}
-                            onChangeText={setEmail}
-                            required
-                        />
-                        </View>
-                        
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80"
-                            placeholder="Password"
-                            secureTextEntry
-                            autoCapitalize="none"
-                            autoCompleteType="password"
-                            textContentType="password"
-                            value={password}
-                            onChangeText={setPassword}
-                            required
-                        />
-                        </View>
+              <TextInputComponent
+              label={'Confirm password'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'confirmpassword'}
+              errors={errors}
+              type="password"
+              touched={touched}
+            />
 
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80"
-                            placeholder="Confirm Password"
-                            secureTextEntry
-                            autoCapitalize="none"
-                            autoCompleteType="password"
-                            textContentType="password"
-                            value={password}
-                            onChangeText={setPassword}
-                            required
-                        />
-                        </View>
-                    </View>
-                    {/* Login Button */}
-                    <TouchableOpacity className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4"
-                    onPress={() => navigation.navigate('LoginScreen')}>
-                        <Text className="text-center text-lg text-white">Sign up</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <TextInputComponent
+              label={'Full Name'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'FullName'}
+              errors={errors}
+              touched={touched}
+            />
+            <TextInputComponent
+              label={'Phone Number'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'phoneNumber'}
+              errors={errors}
+              touched={touched}
+            />
+           <Pressable className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4" onPress={handleSubmit}>
+              <Text  className="text-center text-lg text-white">{loading? "loading": "Sign Up"}</Text>
+            </Pressable>
+          </View>
+     
+          )}
+    
+
+        </Formik>
+        </ScrollView>
 
 
+       </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

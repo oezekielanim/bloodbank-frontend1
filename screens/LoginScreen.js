@@ -1,21 +1,46 @@
 import React from "react";
-import { View, SafeAreaView, Text, TouchableOpacity, Image,TextInput,StyleSheet,Alert } from 'react-native';
+import { View, SafeAreaView, Text, TouchableOpacity, Image,TextInput,StyleSheet,Alert,Pressable, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
+import TextInputComponent from "../components/textInput";
+import { Formik } from "formik";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { sizes } from "../constants";
+import { useUserContext } from "../config/userContext";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+
 
 const LoginScreen = () =>{
     const navigation = useNavigation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const[username, setUsername]= useState('');
+    const {loading,setLoading, fecthUserData ,currentUser}= useUserContext()
+    const { getItem, setItem, removeItem } = useAsyncStorage("email");
 
-    const handleSignIn = () => {
-        // Handle sign in logic here
-        Alert.alert('Login', `Email: ${email}\nPassword: ${password}`);
-      };
-  
+    const handleSignIn = async (email,password) => {
+      setLoading(true)
+      try {
+        const response = await signInWithEmailAndPassword(auth,email,password)
+        if(response?.user){
+          // console.log(response?.user)
+          let userData = await fecthUserData(email) 
+          if (userData!== null){
+            await setItem(response?.user.email);
+            navigation.navigate("HomePage",{userData})
+          }
+          
+        }
+      } catch (error) {
+        console.log(error)
+      }finally{
+        setLoading(false)
+      }
+        
+    };
+
     return(
         <SafeAreaView className="flex-1 justify-center items-center bg-white">
-           <View className="items-center">
+           <KeyboardAvoidingView  behavior="padding" className="items-center">
                 {/* Header */}
                 <Image source={require('../assets/logo.png')} className="mb-5"/>
                 <Text className="text-red-500 text-xl font-bold mb-2">Welcome Back😊</Text>
@@ -23,51 +48,56 @@ const LoginScreen = () =>{
 
                 {/* Login Form */}
                 <View className="flex-1">
-                    <View className="mt-4">
-                        <View className="flex-col m-4">
-                        <Text style={styles.label}>Email address</Text>
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoCompleteType="email"
-                            textContentType="emailAddress"
-                            value={email}
-                            onChangeText={setEmail}
-                            required
-                        />
-                        </View>
-                        
-                        <View className="flex-col m-4">
-                        <View style={styles.passwordHeader}>
-                            <Text style={styles.label}>Password</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('Forgot Password', 'Password reset link will be sent to your email.')}>
-                            <Text style={styles.forgotPassword}>Forgot password?</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <TextInput
-                            style={styles.input}
-                            className="w-80"
-                            placeholder="Password"
-                            secureTextEntry
-                            autoCapitalize="none"
-                            autoCompleteType="password"
-                            textContentType="password"
-                            value={password}
-                            onChangeText={setPassword}
-                            required
-                        />
-                        </View>
-                    </View>
+                  <Formik initialValues={{
+                    email:"",
+                    password:""
+                  }} onSubmit={async (values)=>{
+              await handleSignIn(values?.email,values?.password)
+                  }}>
+       {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          errors,
+          values,
+          touched,
+          setFieldValue,
+        }) => (
+        
+          <View style={{width:sizes.screenWidth,paddingHorizontal:15}}>
+<TextInputComponent
+              label={'Email'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'email'}
+              errors={errors}
+              touched={touched}
+            />
+            <TextInputComponent
+              label={'Password'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'password'}
+              errors={errors}
+              type="password"
+              touched={touched}
+            />
+ 
+            <Pressable className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4" onPress={handleSubmit}>
+              <Text  className="text-center text-lg text-white">{loading? "loading": "Login"}</Text>
+            </Pressable>
+          </View>
+     
+          )}
+    
+
+                  </Formik>
                     {/* Login Button */}
-                    <TouchableOpacity className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4"
-                    onPress={() => navigation.navigate('HomePage')}>
-                        <Text className="text-center text-lg text-white">Login</Text>
-                    </TouchableOpacity>
+                   
                 </View>
-            </View>
+            </KeyboardAvoidingView>
 
         </SafeAreaView>
     );

@@ -1,175 +1,216 @@
-import React from "react";
-import { View, SafeAreaView, Text, TouchableOpacity, Image,TextInput,StyleSheet,Alert } from 'react-native';
+import React, { useEffect } from "react";
+import { View, SafeAreaView, Text, TouchableOpacity, Image, TextInput, StyleSheet, Alert, Pressable, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
+import { Formik } from "formik";
+import TextInputComponent from "../components/textInput";
+import { sizes } from "../constants";
+import TextAreaComponent from "../components/textarea";
 import { useState } from "react";
+import { useUserContext } from "../config/userContext";
+import * as yup from 'yup';
+import SelectComponent from "../components/selectComponent";
+import DatePickerComponent from "../components/datepicker";
+import { addDoc } from "firebase/firestore";
+import { RequestRef } from "../config/firebase";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+
+const RequestPage = () => {
+  const navigation = useNavigation();
+  const { getItem } = useAsyncStorage("email");
+    const [email, setEmail] = useState(''); 
+    useEffect(() => {
+        const fetchEmail = async () => {
+          try {
+            const storedEmail = await getItem();
+            if (storedEmail !== null) {
+              setEmail(storedEmail);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        };
+    
+        fetchEmail();
+      }, []);
+
+  const bloodtypedata = [
+    { value: "A+" },
+    { value: "A-" },
+    { value: "B+" },
+    { value: "B-" },
+    { value: "O-" },
+    { value: "O+" },
+    { value: "AB+" },
+    { value: "AB-" },
+  ];
 
 
-const RequestPage = () =>{
-    const navigation = useNavigation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
-   
-    return(
-        <SafeAreaView className="flex-1 justify-center items-center bg-white">
-             <View className="items-center mt-10">
-                {/* Header */}
-                <Text className="text-gray-700 mb-2">Make Blood Donation Request</Text>
-
-                {/* Login Form */}
-                <View className="flex-1">
-                    <View className="mt-4">
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Fullname"
-                            // keyboardType="email-address"
-                            autoCapitalize="none"
-                            // autoCompleteType="email"
-                            // textContentType="emailAddress"
-                            // value={email}
-                            // onChangeText={setEmail}
-                            required
-                        />
-                        </View>
-
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Phone Number"
-                            keyboardType="name"
-                            autoCapitalize="none"
-                            autoCompleteType="name"
-                            textContentType="name"
-                            // value={email}
-                            // onChangeText={setEmail}
-                            required
-                        />
-                        </View>
-
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80 "
-                            placeholder="Input Blood Type"
-                            keyboardType="name"
-                            autoCapitalize="none"
-                            autoCompleteType="name"
-                            textContentType="name"
-                            // value={email}
-                            // onChangeText={setEmail}
-                            required
-                        />
-                        </View>
-                        
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80"
-                            placeholder="Hospital"
-                            autoCapitalize="none"
-                            // value={password}
-                            // onChangeText={setPassword}
-                            required
-                        />
-                        </View>
-
-                        <View className="flex-col m-4">
-                        <TextInput
-                            style={styles.input}
-                            className="w-80"
-                            placeholder="Request Date"
-                            autoCapitalize="none"
-                            // value={password}
-                            // onChangeText={setPassword}
-                            required
-                        />
-                        </View>
-                        <View style={styles.textAreaContainer}>
-                        <TextInput
-                            style={styles.textArea}
-                            underlineColorAndroid="transparent"
-                            placeholder="Notes (optional)"
-                            placeholderTextColor="grey"
-                            numberOfLines={10}
-                            multiline={true}
-                        />
-                        </View>
-                    </View>
-                    {/* Login Button */}
-                    <TouchableOpacity className="bg-red-500 w-90 py-4 mt-4 rounded-lg mb-4">
-                        <Text className="text-center text-lg text-white">Make Request</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-
-        </SafeAreaView>
-    );
-};
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      paddingHorizontal: 5,
-      backgroundColor: '#fff',
-    },
-    form: {
-      marginTop: 0,
-      alignSelf: 'center',
-      width: '100%',
-      maxWidth: 400,
-    },
-    inputContainer: {
-      marginBottom: 16,
-    },
-    label: {
-      fontSize: 14,
-      fontWeight: '500',
-      color: '#1F2937',
-      marginBottom: 4,
-    },
-    input: {
-      height: 40,
-      borderColor: '#D1D5DB',
-      borderWidth: 1,
-      borderRadius: 4,
-      paddingHorizontal: 8,
-      color: '#1F2937',
-    },
-    passwordHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 4,
-    },
-    forgotPassword: {
-      fontSize: 12,
-      color: '#6366F1',
-      fontWeight: '600',
-    },
-    button: {
-      backgroundColor: '#6366F1',
-      paddingVertical: 12,
-      borderRadius: 4,
-      alignItems: 'center',
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    textAreaContainer: {
-        borderColor: '#808080',
-        borderWidth: 1,
-        padding: 5
-    },
-      textArea: {
-        height: 150,
-        justifyContent: "flex-start"
-    },
+  const donorSchema = yup.object({
+    FullName: yup.string().required('Full name is required'),
+    phoneNum: yup.string().required('Phone number is required'),
+    bloodType: yup.string().required('Blood type is required'),
+    hospital: yup.string().required('Hospital is required'),
+    requestDate: yup.string().required('Request date is required'),
   });
+const request = async (data)=>{
+  setLoading(true)
+  console.log(data)
+try {
+await addDoc(RequestRef,{...data})
+} catch (error) {
+  console.log(error)
+}finally{
+  setLoading(false)
+}
+}
+
+const {currentUser,fecthUserData,loading,setLoading}= useUserContext()
+useEffect(()=>{
+  fecthUserData(email)
+},[])
+console.log("here",currentUser)
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.headerText}>Make Blood Donation Request</Text>
+
+          <Formik initialValues={{
+            FullName: currentUser?.FullName,
+            phoneNum: currentUser?.phoneNumber,
+            email:currentUser?.email,
+            bloodType: "",
+            hospital: "",
+            requestDate: "",
+            notes: ""
+          }}
+            validationSchema={donorSchema}
+            onSubmit={async (values) => {
+               await request(values)
+            }}>
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              errors,
+              values,
+              touched,
+              setFieldValue,
+            }) => (
+              <View style={styles.form}>
+                <View style={{flexDirection:"column",gap:20}}>
+                <TextInputComponent
+                  label={'Full name'}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={'FullName'}
+                  errors={errors}
+                  touched={touched}
+                />
+                <TextInputComponent
+                  label={'Phone Number'}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={'phoneNum'}
+                  errors={errors}
+                  touched={touched}
+                />
+                <TextInputComponent
+              label={'Email'}
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              id={'email'}
+              errors={errors}
+              touched={touched}
+            />
+                <TextInputComponent
+                  label={'Hospital'}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={'hospital'}
+                  errors={errors}
+                  touched={touched}
+                />
+                <SelectComponent
+                  label={"Blood Type"}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={"bloodType"}
+                  data={bloodtypedata}
+                />
+                <DatePickerComponent
+                  label={'Request Date'}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={'requestDate'}
+                  errors={errors}
+                  Datemode={"date"}
+                  touched={touched}
+                />
+                <TextAreaComponent
+                  label={"Notes (Optional)"}
+                  values={values}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  id={"notes"}
+                  errors={errors}
+                  touched={touched}
+                  placeholder="Any additional information"
+                />
+
+                <Pressable style={styles.submitButton} onPress={handleSubmit}>
+                  <Text style={styles.submitButtonText}>{loading ? "Loading..." : "Submit"}</Text>
+                </Pressable>
+                </View>
+              </View>
+            )}
+          </Formik>
+         
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  innerContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  headerText: {
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  form: {
+    flex: 1,
+    width: '100%',
+  },
+  submitButton: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
 
 export default RequestPage;
