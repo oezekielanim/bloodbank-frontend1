@@ -12,9 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet":true,
+      "bundleIdentifier": "com.bloodbank.BloodBank",
+      "config": {
+      "googleMapsApiKey": "AIzaSyB55ABH_ar-RwWxa6k90Gub3kVJPAEANKA"
+      }
     },
+
     "android": {
+      "package": "com.bloodbank.BloodBank",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,3 +31,10 @@
     }
   }
 }
+
+
+    
+    
+    
+    
+  
