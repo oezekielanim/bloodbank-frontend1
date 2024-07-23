@@ -8,8 +8,8 @@ import hospitalsData from '../hospitals.json';
 const INITIAL_REGION = {
   latitude: 7.9465,
   longitude: 1.0232,
-  latitudeDelta: 0.5,
-  longitudeDelta: 0.5,
+  // latitudeDelta: 0.5,
+  // longitudeDelta: 0.5,
 };
 
 const MapPage = () => {

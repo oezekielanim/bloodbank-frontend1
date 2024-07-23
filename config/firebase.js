@@ -24,4 +24,5 @@ export  const auth = getAuth(app)
 export const db= getFirestore(app)
 export const UserRef = collection(db,"Users")
 export const RequestRef = collection(db,"BloodRequests")
-const analytics = getAnalytics(app);
+export const DonateRef = collection(db,"DonationSchedules")
+const analytics = getAnalytics(app);  

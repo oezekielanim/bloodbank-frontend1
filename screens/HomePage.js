@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import { useUserContext } from "../config/userContext";
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { UserRef } from '../config/firebase';
+import { where, query, getDoc, getDocs, collection } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 
 const HomePage = ({navigation}) => {
+    const [username, setUsername] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const { getItem } = useAsyncStorage("Fullname");
+    const [ email, setEmail] = useState('');
+    
 
     var greeting = null
     var data = [
@@ -22,14 +31,13 @@ const HomePage = ({navigation}) => {
         }
     }
     
-    const { getItem } = useAsyncStorage("email");
-    const [email, setEmail] = useState(''); 
     useEffect(() => {
         const fetchEmail = async () => {
           try {
             const storedEmail = await getItem();
             if (storedEmail !== null) {
               setEmail(storedEmail);
+              fetchUsername(storedEmail); 
             }
           } catch (error) {
             console.log(error);
@@ -37,7 +45,8 @@ const HomePage = ({navigation}) => {
         };
     
         fetchEmail();
-      }, []);
+    }, []);
+
 
     return (
         <SafeAreaView className = 'flex-1 bg-white'>

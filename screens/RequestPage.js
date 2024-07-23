@@ -92,7 +92,7 @@ console.log("here",currentUser)
             {({
               handleChange,
               handleBlur,
-              handleSubmit,
+              faceSubmit,
               errors,
               values,
               touched,

@@ -1,21 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text,SafeAreaView,ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from "formik";
 import TextInputComponent from "../components/textInput";
-import { sizes } from "../constants";
-import TextAreaComponent from "../components/textarea";
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { useUserContext } from '../config/userContext';
 
 const EditProfilePage = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(route.params.userData);
+  const [email, setEmail] = useState('')
+  const {currentUser, fecthUserData, loading, setLoading} = useUserContext();
+  const { getItem } = useAsyncStorage("email");
+  const bloodtypedata = [
+    { value: "A+" },
+    { value: "A-" },
+    { value: "B+" },
+    { value: "B-" },
+    { value: "O-" },
+    { value: "O+" },
+    { value: "AB+" },
+    { value: "AB-" },
+  ];
 
   const handleSave = () => {
     // Handle save action
     console.log('Saved:', userData);
     navigation.goBack();
   };
+
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try{
+        const storedEmail = await getItem();
+        if (storedEmail !== null){
+          setEmail(storedEmail)
+        }
+      }catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchEmail();
+  }, []);
+
+  useEffect(()=> {
+    fecthUserData(email)
+  }, [])
 
   const handleChange = (field, value) => {
     setUserData({ ...userData, [field]: value });
@@ -33,13 +65,13 @@ const EditProfilePage = () => {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
-        value={userData.fullName}
+        value={currentUser?.FullName}
         onChangeText={(value) => handleChange('fullName', value)}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
-        value={userData.email}
+        value={currentUser?.email}
         onChangeText={(value) => handleChange('email', value)}
       />
       <TextInput
@@ -51,21 +83,15 @@ const EditProfilePage = () => {
       <TextInput
          style={styles.input}
         placeholder="Phone Number"
-        value={userData.phoneNumber}
+        value={currentUser?.phoneNumber}
         onChangeText={(value) => handleChange('phoneNumber', value)}
-      />
-      <TextInput
-       style={styles.input}
-        placeholder="Location"
-        value={userData.location}
-        onChangeText={(value) => handleChange('location', value)}
       />
       </View>
       <TouchableOpacity className="bg-red-500 w-100 py-4 ml-5 mr-5 mt-20 rounded-lg mb-4"
-                onPress={() => navigation.navigate('ProfilePage')}>
-                    <Text className="text-center text-lg text-white">Save</Text>
-                </TouchableOpacity>
-                </View>
+          onPress={() => navigation.navigate('ProfilePage')}>
+              <Text className="text-center text-lg text-white">Save</Text>
+      </TouchableOpacity>
+    </View>
     </View>
     </ScrollView>
    </SafeAreaView>
