@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, SafeAreaView, Text, TouchableOpacity, StyleSheet, Alert, Pressable, ScrollView } from 'react-native';
+import { View, SafeAreaView, Text, TouchableOpacity, KeyboardAvoidingView,StyleSheet,Platform, Alert, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
 import TextInputComponent from "../components/textInput";
@@ -35,6 +35,8 @@ const DonatePage = () => {
     bloodType: yup.string().required('Blood type is required'),
     hospital: yup.string().required('Hospital is required'),
     appDate: yup.string().required('Appointment date is required'),
+    age: yup.number().required('Age is required').min(17, 'You must be at least 17 years old to donate blood'),
+    weight: yup.number().required('Weight is required').min(50, 'You must weigh at least 50 kg to donate blood'),
   });
 
   const request = async (data) => {
@@ -59,15 +61,49 @@ const DonatePage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+       <KeyboardAvoidingView style={styles.container}  behavior="padding" keyboardVerticalOffset={Platform.OS === "ios"?20 : 0}>
+      <ScrollView >
         <View style={styles.innerContainer}>
           <Text style={styles.headerText}>Schedule an appointment</Text>
+          <View>
+                    <Text className='text-xl font-bold '>Health Tips(Please Take note of these)</Text>
 
+                    <View className='mt-4'>
+                        <View className='flex-row items-center mb-4'>
+                            <View className='w-8 h-8 rounded-full bg-black justify-center items-center mr-4'>
+                                <Text className='text-white text-lg'>❗</Text>
+                            </View>
+                            <View>
+                                <Text className='font-bold'>Before Donating Blood,</Text>
+                                <Text className='text-gray-600 mr-10'>1.Stay hydrated in the days closer to your donation.</Text>
+                                <Text className='text-gray-600 mr-10'>2.Avoid donating on an empty stomach.</Text>
+                                <Text className='text-gray-600 mr-10'>3. Ensure you rest before your appointment.</Text>
+                                <Text className='text-gray-600 mr-10'>4.Inform the donation center of any medications you're taking.</Text>
+                                <Text className='text-gray-600 mr-10'>5.Bring identification</Text>
+                            </View>
+                        </View>
+
+                        <View className='flex-row items-center mb-4'>
+                            <View className='w-8 h-8 rounded-full bg-black justify-center items-center mr-4'>
+                                <Text className='text-white text-lg'>❗</Text>
+                            </View>
+                            <View>
+                                <Text className='font-bold'>After Donating Blood,</Text>
+                                <Text className='text-gray-600 mr-10'>1.Replenish lost fluids by drinking water</Text>
+                                <Text className='text-gray-600 mr-10'>2.Consume iron-rich foods to replenish iron levels.</Text>
+                                <Text className='text-gray-600 mr-10'>3. Rest and avoid heavy lifting for the rest of the day.</Text>
+                                <Text className='text-gray-600 mr-10'>4. Watch for any unusual symptoms or reactions.</Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
           <Formik
             initialValues={{
               fullName: currentUser?.username || '',
               phoneNum: currentUser?.phoneNumber || '',
               bloodType: "",
+              age:"",
+              weight:"",
               hospital: "",
               appDate: "",
             }}
@@ -105,6 +141,8 @@ const DonatePage = () => {
                     errors={errors}
                     touched={touched}
                   />
+               <Text className='text-red-500 mr-10'>Please refer to the map to find a nearby hospital where you'd like to donate blood.</Text>
+
                   <TextInputComponent
                     label={'Hospital'}
                     values={values}
@@ -121,6 +159,24 @@ const DonatePage = () => {
                     handleBlur={handleBlur}
                     id={"bloodType"}
                     data={bloodtypedata}
+                  />
+                    <TextInputComponent
+                    label={'Age'}
+                    values={values}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                    id={'age'}
+                    errors={errors}
+                    touched={touched}
+                  />
+                   <TextInputComponent
+                    label={'Weight'}
+                    values={values}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                    id={'weight'}
+                    errors={errors}
+                    touched={touched}
                   />
                   <DatePickerComponent
                     label={'Appointment Date'}
@@ -141,6 +197,7 @@ const DonatePage = () => {
           </Formik>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

@@ -5,13 +5,15 @@ import { Formik } from "formik";
 import TextInputComponent from "../components/textInput";
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useUserContext } from '../config/userContext';
+import { db } from '../config/firebase';
+import { doc,updateDoc } from 'firebase/firestore';
 
-const EditProfilePage = () => {
+const EditProfilePage = () => { 
   const route = useRoute();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(route.params.userData);
   const [email, setEmail] = useState('')
-  const {currentUser, fecthUserData, loading, setLoading} = useUserContext();
+  const {currentUser, fecthUserData, loading, setLoading,updateUser} = useUserContext();
   const { getItem } = useAsyncStorage("email");
   const bloodtypedata = [
     { value: "A+" },
@@ -24,11 +26,18 @@ const EditProfilePage = () => {
     { value: "AB-" },
   ];
 
-  const handleSave = () => {
-    // Handle save action
-    console.log('Saved:', userData);
-    navigation.goBack();
-  };
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const userDoc = doc(db, 'users', email);
+      await updateDoc(userDoc, userData);
+      setLoading(false);
+      navigation.navigate('ProfilePage');
+    } catch (error) {
+      console.error('Error updating document: ', error);
+      setLoading(false);
+    }
+  };    
 
   useEffect(() => {
     const fetchEmail = async () => {
@@ -49,9 +58,16 @@ const EditProfilePage = () => {
     fecthUserData(email)
   }, [])
 
+  useEffect(() => {
+    if (currentUser) {
+      setUserData(currentUser); 
+    }
+  }, [currentUser]);
+  
   const handleChange = (field, value) => {
-    setUserData({ ...userData, [field]: value });
+    updateUser({ [field]: value }); 
   };
+  
 
   return (
     <SafeAreaView>
@@ -83,12 +99,12 @@ const EditProfilePage = () => {
       <TextInput
          style={styles.input}
         placeholder="Phone Number"
-        value={currentUser?.phoneNumber}
+        value={currentUser?.phoneNumber }
         onChangeText={(value) => handleChange('phoneNumber', value)}
       />
       </View>
       <TouchableOpacity className="bg-red-500 w-100 py-4 ml-5 mr-5 mt-20 rounded-lg mb-4"
-          onPress={() => navigation.navigate('ProfilePage')}>
+          onPress={() => handleSave()}>
               <Text className="text-center text-lg text-white">Save</Text>
       </TouchableOpacity>
     </View>
@@ -113,6 +129,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+    paddingHorizontal: 10,
+    
+    paddingHorizontal: 10,    
     
     borderRadius:8,
     height:50,

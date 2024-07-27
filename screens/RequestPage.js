@@ -55,11 +55,14 @@ const RequestPage = () => {
   });
 const request = async (data)=>{
   setLoading(true)
-  console.log(data)
 try {
-await addDoc(RequestRef,{...data})
+await addDoc(RequestRef,{...data});
+Alert.alert('Success', 'Request submitted successfully', [
+  { text: 'OK', onPress: () => navigation.navigate('HomePage') }
+]);
 } catch (error) {
   console.log(error)
+  Alert.alert('Error', 'Failed to submit request');
 }finally{
   setLoading(false)
 }
@@ -70,11 +73,14 @@ useEffect(()=>{
   fecthUserData(email)
 },[])
 console.log("here",currentUser)
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.innerContainer}>
           <Text style={styles.headerText}>Make Blood Donation Request</Text>
+          
+          <Text className='mb-3 text-red-500 '>Ensure all the information provided (contact details, blood type, hospital) is accurate for quick processing.</Text>
 
           <Formik initialValues={{
             FullName: currentUser?.FullName,
@@ -96,6 +102,7 @@ console.log("here",currentUser)
               errors,
               values,
               touched,
+              handleSubmit,
               setFieldValue,
             }) => (
               <View style={styles.form}>
@@ -127,6 +134,8 @@ console.log("here",currentUser)
               errors={errors}
               touched={touched}
             />
+               <Text className='text-red-500 mr-10'>Please refer to the map to find a nearby hospital where you'd like to donate blood.</Text>
+
                 <TextInputComponent
                   label={'Hospital'}
                   values={values}

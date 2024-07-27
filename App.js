@@ -14,6 +14,8 @@ import ProfilePage from './screens/ProfilePage';
 import { UserContextProvider } from './config/userContext';
 import EditProfilePage from './screens/EditProfilePage.js';
 
+
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -33,17 +35,8 @@ export default function App() {
         <Stack.Screen name="MapPage" component={MapPage} options={{ headerShown:false}}/>
         <Stack.Screen name="EditProfilePage" component={EditProfilePage} options={{ headerShown:false}}/>
         <Stack.Screen name="ProfilePage" component={ProfilePage} options={{ headerShown:false}}/>
-        <Stack.Screen name="DonatePage" component={DonatePage} options={{  title : 'SUBMIT DONOR APPOINTMENT',
-          headerTitleStyle: {
-            color: 'red'
-          }
-          }}/>
-        <Stack.Screen name="RequestPage" component={RequestPage} options={{
-          title : 'SUBMIT BLOOD REQUEST',
-          headerTitleStyle: {
-            color: 'red'
-          }
-        }}/>
+        <Stack.Screen name="DonatePage" component={DonatePage} options={{  title : '', }}/>
+        <Stack.Screen name="RequestPage" component={RequestPage} options={{title : '', }}/>
       </Stack.Navigator>
     </NavigationContainer>
     </UserContextProvider>

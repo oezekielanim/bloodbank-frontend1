@@ -19,6 +19,7 @@
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "expo": "~51.0.20",
+    "expo-location": "~17.0.1",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.12.3",
     "formik": "^2.4.6",
@@ -30,11 +31,12 @@
     "react-native-dropdown-select-list": "^2.0.5",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-maps": "^1.14.0",
+    "react-native-modal": "^13.0.1",
     "react-native-select-dropdown": "^4.0.1",
+    "react-native-toast-message": "^2.2.0",
     "react-native-ui-datepicker": "^2.0.3",
     "react-navigation-stack": "^2.10.4",
-    "yup": "^1.4.0",
-    "expo-location": "~17.0.1"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

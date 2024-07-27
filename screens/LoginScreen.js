@@ -9,6 +9,17 @@ import { auth } from "../config/firebase";
 import { sizes } from "../constants";
 import { useUserContext } from "../config/userContext";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+  
+});
 
 
 const LoginScreen = () =>{
@@ -31,7 +42,11 @@ const LoginScreen = () =>{
           
         }
       } catch (error) {
-        console.log(error)
+        Alert.alert(
+          "Login Failed",
+          "Invalid credentials. Please check your email and password and try again.",
+          [{ text: "OK" }]
+        );
       }finally{
         setLoading(false)
       }
@@ -51,9 +66,13 @@ const LoginScreen = () =>{
                   <Formik initialValues={{
                     email:"",
                     password:""
-                  }} onSubmit={async (values)=>{
+                  }} onSubmit={async (values, {resetForm})=>{
               await handleSignIn(values?.email,values?.password)
-                  }}>
+                  resetForm()
+                  }}
+                  validationSchema={validationSchema}
+                  >
+                  
        {({
           handleChange,
           handleBlur,

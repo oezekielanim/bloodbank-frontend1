@@ -8,13 +8,28 @@ import { addDoc } from "firebase/firestore";
 import { Formik } from "formik";
 import TextInputComponent from "../components/textInput";
 import { sizes } from "../constants";
+import * as Yup from 'yup';
 
+
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+  confirmpassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required'),
+  FullName: Yup.string()
+    .required('Full Name is required'),
+  phoneNumber: Yup.string()
+    .required('Phone Number is required'),
+});
 
 const SignUpPage = ({navigation}) =>{
-   // const navigation = useNavigation();
-
-  
     const [loading,setLoading] = useState(false)
+
 const signUp = async (email,password,FullName,phoneNumber)=>{
 setLoading(true)
 try {
@@ -25,36 +40,31 @@ try {
       email:email,
       FullName:FullName,
       phoneNumber:phoneNumber
-    })
-
+    });
+    Alert.alert("Success",
+      "Sign up successful! Please log in to start.",
+      [{text: "Ok", onPress:() => navigation.navigate("LoginScreen") }]
+    );
   }
-  console.log("Success")
-  //use toast
-  
-  
-  //navigate to main
+  console.log("Success");
 } catch (error) {
   console.log(error)
 }finally{
 setLoading(false)
 }
-navigation.navigate("LoginScreen")
-}
+};
    
     return(
-        <SafeAreaView style={{flex:1,width:sizes.screenWidth,flexDirection:"column"}}>
-          <KeyboardAvoidingView style={{height:"100%"}}    behavior="padding" keyboardVerticalOffset={Platform.OS === "ios"?20 : 0}>
-  
+        <SafeAreaView style={styles.container} >
+          <KeyboardAvoidingView style={styles.container}    behavior="padding" keyboardVerticalOffset={Platform.OS === "ios"?20 : 0}>
             <ScrollView contentContainerStyle={{flexDirection:"column",justifyContent:"center",alignItems:"center"}} style={{minHeight:"100%"}}>
               
                 <Image source={require('../assets/logo.png')} className="mb-5"/>
                 <Text className="text-red-500 text-xl font-bold mb-2">Create your account</Text>
-                <Text className="text-gray-700 mb-2">Register now to create new account</Text>
+                <Text className="text-gray-700 mb-2" style={styles.emoji}>Register now to create new account{'\u2705'}</Text>
 
                 {/* Login Form */}
-                <Formik
-
-                
+                <Formik   
         initialValues={{
           email: '',
           FullName:"",
@@ -66,7 +76,7 @@ navigation.navigate("LoginScreen")
           signUp(values.email,values.password,values.FullName,values.phoneNumber)
         resetForm()
              }}
-             //create a validation schema
+             validationSchema={validationSchema}
         >
           {({
           handleChange,
@@ -77,9 +87,8 @@ navigation.navigate("LoginScreen")
           touched,
           setFieldValue,
         }) => (
-        
-          <View style={{width:sizes.screenWidth,paddingHorizontal:15}}>
-<TextInputComponent
+          <View style={{width:sizes.screenWidth,paddingHorizontal:15, }}>
+             <TextInputComponent
               label={'Email'}
               values={values}
               handleChange={handleChange}
@@ -132,18 +141,14 @@ navigation.navigate("LoginScreen")
               <Text  className="text-center text-lg text-white">{loading? "loading": "Sign Up"}</Text>
             </Pressable>
           </View>
-     
           )}
-    
-
         </Formik>
         </ScrollView>
-
-
        </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
       flex: 1,

@@ -14,6 +14,10 @@ export const  UserContextProvider = ({children})=>{
  const [loading,setLoading]= useState(false)
  const { getItem, setItem, removeItem } = useAsyncStorage("Fullname");
 
+ const updateUser = (newData) => {
+  setCurrentUser(prevState => ({ ...prevState, ...newData }));
+};
+
  const fecthUserData = async (email)=>{
    try {
     const q= query(UserRef,where("email","==",email)) 
@@ -28,5 +32,5 @@ export const  UserContextProvider = ({children})=>{
 
  }
 
- return <UserContext.Provider value={{currentUser,setCurrentUser,fecthUserData,loading,setLoading}}>{children}</UserContext.Provider>
+ return <UserContext.Provider value={{currentUser,setCurrentUser,fecthUserData,loading,setLoading,updateUser}}>{children}</UserContext.Provider>
 }
