@@ -31,8 +31,8 @@ export default function App() {
             color: 'red',
           }}}/>
         <Stack.Screen name="SignUpPage" component={SignUpPage} options={{ headerShown:false}}/>
-        <Stack.Screen name="ChatPage" component={ChatPage} options={{ headerShown:false}}/>
-        <Stack.Screen name="MapPage" component={MapPage} options={{ headerShown:false}}/>
+        <Stack.Screen name="ChatPage" component={ChatPage} options={{ title:'',}}/>
+        <Stack.Screen name="MapPage" component={MapPage} options={{title:'',}}/>
         <Stack.Screen name="EditProfilePage" component={EditProfilePage} options={{ headerShown:false}}/>
         <Stack.Screen name="ProfilePage" component={ProfilePage} options={{ headerShown:false}}/>
         <Stack.Screen name="DonatePage" component={DonatePage} options={{  title : '', }}/>

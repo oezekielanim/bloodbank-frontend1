@@ -13,11 +13,18 @@ import DatePickerComponent from "../components/datepicker";
 import { addDoc } from "firebase/firestore";
 import { RequestRef } from "../config/firebase";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import hospitalData from '../hospitals.json';
+import { debounce } from '../components/debounce'; 
+
+
 
 const RequestPage = () => {
   const navigation = useNavigation();
   const { getItem } = useAsyncStorage("email");
     const [email, setEmail] = useState(''); 
+    const [filteredHospitals,setFilteredHospitals]= useState(hospitalData);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+  
     useEffect(() => {
         const fetchEmail = async () => {
           try {
@@ -66,13 +73,29 @@ Alert.alert('Success', 'Request submitted successfully', [
 }finally{
   setLoading(false)
 }
-}
+};
 
 const {currentUser,fecthUserData,loading,setLoading}= useUserContext()
 useEffect(()=>{
   fecthUserData(email)
 },[])
-console.log("here",currentUser)
+console.log("here",currentUser);
+
+const handleHospitalChange =debounce((text, setFieldValue) => {
+  setFieldValue('hospital', text);
+  if (text.length > 0) {
+    const filtered = hospitalData.filter(hospital =>
+      hospital.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredHospitals(filtered);
+    setShowSuggestions(true);
+  } else {
+  setFilteredHospitals([]);
+  setShowSuggestions(false);
+  }
+}, 300);
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,17 +157,35 @@ console.log("here",currentUser)
               errors={errors}
               touched={touched}
             />
+
+             <View style={styles.hospitalContainer}>
+                      <TextInput
+                        value={values.hospital}
+                        onChangeText={text => handleHospitalChange(text, setFieldValue)}
+                        onBlur={handleBlur('hospital')}
+                        placeholder="Search for a hospital..."
+                        style={styles.textInput}
+                      />
+                      {showSuggestions && (
+                        <View style={styles.suggestionContainer}>
+                          {filteredHospitals.map(hospital => (
+                            <Pressable
+                              key={hospital.id}
+                              onPress={() => {
+                                setFieldValue('hospital', hospital.name);
+                                setShowSuggestions(false);
+                              }}
+                              style={styles.suggestionItem}
+                            >
+                              <Text style={styles.suggestionText}>{hospital.name}</Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      )}
+                    </View>
                <Text className='text-red-500 mr-10'>Please refer to the map to find a nearby hospital where you'd like to donate blood.</Text>
 
-                <TextInputComponent
-                  label={'Hospital'}
-                  values={values}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                  id={'hospital'}
-                  errors={errors}
-                  touched={touched}
-                />
+
                 <SelectComponent
                   label={"Blood Type"}
                   values={values}
@@ -207,6 +248,47 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     width: '100%',
+  },
+  textInput: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    fontSize: 16,
+    
+  },
+  hospitalContainer:{
+    position: 'relative',
+    marginVertical: 10,
+  
+  },
+  suggestionContainer: {
+    marginTop: 5,
+    borderRadius: 8,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    maxHeight: 150,
+    backgroundColor: '#fff',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+   suggestionItem: {
+    padding: 10,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+  },
+  suggestionItemLast: {
+    borderBottomWidth: 0,
+  },
+  suggestionText: {
+    fontSize: 16,
   },
   submitButton: {
     backgroundColor: '#FF0000',

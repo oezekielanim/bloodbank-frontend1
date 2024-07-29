@@ -14,8 +14,9 @@ const HomePage = ({navigation}) => {
     const [username, setUsername] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { getItem } = useAsyncStorage("Fullname");
+    const { getItem } = useAsyncStorage("email");
     const [ email, setEmail] = useState('');
+    const { currentUser, fecthUserData } = useUserContext();
     
 
     var greeting = null
@@ -38,7 +39,7 @@ const HomePage = ({navigation}) => {
             const storedEmail = await getItem();
             if (storedEmail !== null) {
               setEmail(storedEmail);
-              fetchUsername(storedEmail); 
+              fecthUserData(storedEmail); 
             }
           } catch (error) {
             console.log(error);
@@ -48,11 +49,19 @@ const HomePage = ({navigation}) => {
         fetchEmail();
     }, []);
 
+ useEffect(() => {
+    if (currentUser) {
+      setUsername(currentUser.fullName);
+    }
+  }, [currentUser]);
+
     useEffect(() => {
         navigation.setOptions({
             gestureEnabled: false,
         });
     }, [navigation]);
+
+
 
 
     return (
@@ -64,7 +73,7 @@ const HomePage = ({navigation}) => {
                         <Image source={require('../assets/User.png')} className="mb-5 h-12 w-12"/>
                     </TouchableOpacity>
                 </View>
-                <Text className='text-xl font-bold mt-8'>Hi {email} 👋,</Text>
+                <Text className='text-xl font-bold mt-8'>Hi {username} 👋,</Text>
                 <Text className='text-2xl font-bold'>{greeting}.</Text>
                 
                 <View className ='mt-8'>

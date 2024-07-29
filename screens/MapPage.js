@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigation } from "@react-navigation/native";
-import { View, SafeAreaView, Text, TouchableOpacity, StyleSheet, Alert, Pressable } from 'react-native';
+import { View, SafeAreaView, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location'; // Import Location from expo-location
 import hospitalsData from '../hospitals.json';
@@ -8,8 +8,8 @@ import hospitalsData from '../hospitals.json';
 const INITIAL_REGION = {
   latitude: 7.9465,
   longitude: 1.0232,
-  // latitudeDelta: 0.5,
-  // longitudeDelta: 0.5,
+  latitudeDelta: 5.0,
+  longitudeDelta:5.0,
 };
 
 const MapPage = () => {
@@ -20,13 +20,13 @@ const MapPage = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={focusMap}>
-          <View style={{ padding: 10 }}>
-            <Text>Focus</Text>
-          </View>
-        </TouchableOpacity>
-      ),
+      // headerRight: () => (
+      //   <TouchableOpacity onPress={focusMap}>
+      //     <View style={{ padding: 10 }}>
+      //       <Text style={styles.focusText}>Focus</Text>
+      //     </View>
+      //   </TouchableOpacity>
+      // ),
     });
     getLocation();
   }, []);
@@ -37,11 +37,15 @@ const MapPage = () => {
       Alert.alert('Permission to access location was denied');
       return;
     }
-
+    try {
     let location = await Location.getCurrentPositionAsync({});
     setCurrentLocation(location.coords);
     findClosestHospitals(location.coords);
-  };
+  }catch (error) {
+    Alert.alert('Error', 'Unable to get current location');
+    console.error(error);
+  }
+};
 
   const findClosestHospitals = (userLocation) => {
     const hospitalsWithDistance = hospitalsData.map(hospital => {
@@ -68,22 +72,22 @@ const MapPage = () => {
     return R * 2 * Math.asin(Math.sqrt(a));
   };
 
-  const focusMap = () => {
-    if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        ...INITIAL_REGION,
-        latitudeDelta: 0.5,
-        longitudeDelta: 0.5,
-      });
-    }
-  };
+  // const focusMap = () => {
+  //   if (mapRef.current && currentLocation) {
+  //     mapRef.current.animateToRegion({
+  //       latitude: currentLocation.latitude,
+  //       longitude: currentLocation.longitude,
+  //       latitudeDelta: 0.005,
+  //       longitudeDelta: 0.005,
+  //     }, 1000);
+  //   } else {
+  //     Alert.alert('Location not available', 'Unable to determine current location.');
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
-        <Pressable className="ml-5 mt-2 " onPress={() => navigation.navigate("HomePage")}>
-          <Text>Back</Text>
-        </Pressable>
         <MapView
           style={styles.map}
           initialRegion={INITIAL_REGION}
@@ -112,6 +116,9 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
+  },
+  focusText: {
+    color: 'blue',
   },
 });
 

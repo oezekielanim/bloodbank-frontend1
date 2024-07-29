@@ -44,11 +44,7 @@ console.log(chatHistory)
 
   return (
 <SafeAreaView style={styles.container} >
-  <Pressable className="ml-5 mt-2 " onPress={()=>navigation.navigate("HomePage")}>
-    <Text>Back</Text>
-  </Pressable>
 <KeyboardAvoidingView style={{height:"100%"}}    behavior="padding" keyboardVerticalOffset={Platform.OS === "ios"?20 : 0}>
-  
   <ScrollView contentContainerStyle={styles.chatContainer}>
  {
   chatHistory?.length === 0 ? (<View style={{width:"100%",flexDirection:"row",justifyContent:"center",alignItems:"center",marginTop:sizes.screenHeight/2.3,}}>
@@ -89,6 +85,7 @@ console.log(chatHistory)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   chatContainer: {
     paddingHorizontal: 15,

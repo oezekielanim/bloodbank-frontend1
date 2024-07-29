@@ -36,7 +36,6 @@ const ProfilePage = () => {
     const userData = {
         fullName: '',
         email: '',
-        bloodGroup: '',
         phoneNumber: '',
         // location: '',
       };
@@ -60,10 +59,10 @@ const ProfilePage = () => {
         <Text style={styles.detailItem}>Phone Number: {currentUser?.phoneNumber}</Text>
         {/* <Text style={styles.detailItem}>Location: {userData.location}</Text> */}
       </View>
-      {/* <TouchableOpacity className="bg-red-500 w-80 py-4 ml-5 rounded-lg mb-4 " onPress={() => navigation.navigate('EditProfilePage', { userData })}>
+      <TouchableOpacity className="bg-red-500 w-80 py-4 ml-5 rounded-lg mb-4 " onPress={() => navigation.navigate('EditProfilePage', { userData })}>
         <Text  className="text-center text-lg text-white">Edit</Text>
-      </TouchableOpacity> */}
-      <TouchableOpacity className="bg-gray-500 w-80 py-4 ml-5 rounded-lg mb-4"
+      </TouchableOpacity> 
+          <TouchableOpacity className="bg-gray-500 w-80 py-4 ml-5 rounded-lg mb-4"
                 onPress={() => setIsModalVisible(true)}>
                     <Text className="text-center text-lg text-white">Logout</Text>
                 </TouchableOpacity>

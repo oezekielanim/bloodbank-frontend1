@@ -1,21 +1,24 @@
-import React, { useEffect } from "react";
-import { View, SafeAreaView, Text, TouchableOpacity, KeyboardAvoidingView,StyleSheet,Platform, Alert, Pressable, ScrollView } from 'react-native';
+import React, { useEffect,useState } from "react";
+import { View, SafeAreaView, TextInput,Text, TouchableOpacity, KeyboardAvoidingView,StyleSheet,Platform, Alert, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
 import TextInputComponent from "../components/textInput";
 import { sizes } from "../constants";
 import TextAreaComponent from "../components/textarea";
-import { useState } from "react";
 import { useUserContext } from "../config/userContext";
 import * as yup from 'yup';
 import SelectComponent from "../components/selectComponent";
 import DatePickerComponent from "../components/datepicker";
 import { addDoc } from "firebase/firestore";
 import { DonateRef } from "../config/firebase";
+import hospitalData from '../hospitals.json';
+import { debounce } from '../components/debounce'; 
 
 const DonatePage = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [filteredHospitals,setFilteredHospitals]= useState(hospitalData);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
 
   const bloodtypedata = [
@@ -34,7 +37,7 @@ const DonatePage = () => {
     phoneNum: yup.string().required('Phone number is required'),
     bloodType: yup.string().required('Blood type is required'),
     hospital: yup.string().required('Hospital is required'),
-    appDate: yup.string().required('Appointment date is required'),
+    appDate: yup.string().typeError('Age must be a number').required('Appointment date is required'),
     age: yup.number().required('Age is required').min(17, 'You must be at least 17 years old to donate blood'),
     weight: yup.number().required('Weight is required').min(50, 'You must weigh at least 50 kg to donate blood'),
   });
@@ -58,6 +61,20 @@ const DonatePage = () => {
   useEffect(() => {
     fecthUserData("");
   }, []);
+
+  const handleHospitalChange =debounce((text, setFieldValue) => {
+    setFieldValue('hospital', text);
+    if (text.length > 0) {
+      const filtered = hospitalData.filter(hospital =>
+        hospital.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredHospitals(filtered);
+      setShowSuggestions(true);
+    } else {
+    setFilteredHospitals([]);
+    setShowSuggestions(false);
+    }
+  }, 300);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -99,7 +116,7 @@ const DonatePage = () => {
                 </View>
           <Formik
             initialValues={{
-              fullName: currentUser?.username || '',
+              fullName: currentUser?.FullName || '',
               phoneNum: currentUser?.phoneNumber || '',
               bloodType: "",
               age:"",
@@ -141,17 +158,35 @@ const DonatePage = () => {
                     errors={errors}
                     touched={touched}
                   />
-               <Text className='text-red-500 mr-10'>Please refer to the map to find a nearby hospital where you'd like to donate blood.</Text>
+                 <View style={styles.hospitalContainer}>
+                      <TextInput
+                        value={values.hospital}
+                        onChangeText={text => handleHospitalChange(text, setFieldValue)}
+                        onBlur={handleBlur('hospital')}
+                        placeholder="Search for a hospital..."
+                        style={styles.textInput}
+                      />
+                      {showSuggestions && (
+                        <View style={styles.suggestionContainer}>
+                          {filteredHospitals.map(hospital => (
+                            <Pressable
+                              key={hospital.id}
+                              onPress={() => {
+                                setFieldValue('hospital', hospital.name);
+                                setShowSuggestions(false);
+                              }}
+                              style={styles.suggestionItem}
+                            >
+                              <Text style={styles.suggestionText}>{hospital.name}</Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                 <Text className='text-red-500 mr-10'>Please refer to the map to find a nearby hospital where you'd like to donate blood.</Text>
 
-                  <TextInputComponent
-                    label={'Hospital'}
-                    values={values}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    id={'hospital'}
-                    errors={errors}
-                    touched={touched}
-                  />
+
+
                   <SelectComponent
                     label={"Blood Type"}
                     values={values}
@@ -170,7 +205,7 @@ const DonatePage = () => {
                     touched={touched}
                   />
                    <TextInputComponent
-                    label={'Weight'}
+                    label={'Weight(Value must be in kg)'}
                     values={values}
                     handleChange={handleChange}
                     handleBlur={handleBlur}
@@ -221,6 +256,47 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     width: '100%',
+  },
+  textInput: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    fontSize: 16,
+    
+  },
+  hospitalContainer:{
+    position: 'relative',
+    marginVertical: 10,
+  
+  },
+  suggestionContainer: {
+    marginTop: 5,
+    borderRadius: 8,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    maxHeight: 150,
+    backgroundColor: '#fff',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+   suggestionItem: {
+    padding: 10,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+  },
+  suggestionItemLast: {
+    borderBottomWidth: 0,
+  },
+  suggestionText: {
+    fontSize: 16,
   },
   submitButton: {
     backgroundColor: '#FF0000',

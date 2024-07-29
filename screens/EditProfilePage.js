@@ -15,17 +15,7 @@ const EditProfilePage = () => {
   const [email, setEmail] = useState('')
   const {currentUser, fecthUserData, loading, setLoading,updateUser} = useUserContext();
   const { getItem } = useAsyncStorage("email");
-  const bloodtypedata = [
-    { value: "A+" },
-    { value: "A-" },
-    { value: "B+" },
-    { value: "B-" },
-    { value: "O-" },
-    { value: "O+" },
-    { value: "AB+" },
-    { value: "AB-" },
-  ];
-
+  
   const handleSave = async () => {
     try {
       setLoading(true);
@@ -55,8 +45,10 @@ const EditProfilePage = () => {
   }, []);
 
   useEffect(()=> {
-    fecthUserData(email)
-  }, [])
+    if (email) {
+      fecthUserData(email);
+    }
+  }, [email]);
 
   useEffect(() => {
     if (currentUser) {
@@ -65,7 +57,10 @@ const EditProfilePage = () => {
   }, [currentUser]);
   
   const handleChange = (field, value) => {
-    updateUser({ [field]: value }); 
+    setUserData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
   };
   
 
@@ -81,25 +76,20 @@ const EditProfilePage = () => {
       <TextInput
         style={styles.input}
         placeholder="Full Name"
-        value={currentUser?.FullName}
+        value={userData.fullName || ''}
         onChangeText={(value) => handleChange('fullName', value)}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
-        value={currentUser?.email}
+        value={userData.email || ''}
         onChangeText={(value) => handleChange('email', value)}
       />
-      <TextInput
-         style={styles.input}
-        placeholder="Blood Group"
-        value={userData.bloodGroup}
-        onChangeText={(value) => handleChange('bloodGroup', value)}
-      />
+     
       <TextInput
          style={styles.input}
         placeholder="Phone Number"
-        value={currentUser?.phoneNumber }
+        value={userData.phoneNumber || ''}
         onChangeText={(value) => handleChange('phoneNumber', value)}
       />
       </View>
