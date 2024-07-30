@@ -36,6 +36,7 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-ui-datepicker": "^2.0.3",
     "react-navigation-stack": "^2.10.4",
+    "twrnc": "^4.5.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

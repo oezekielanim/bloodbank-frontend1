@@ -13,7 +13,7 @@ import MapPage from './screens/MapPage';
 import ProfilePage from './screens/ProfilePage';
 import { UserContextProvider } from './config/userContext';
 import EditProfilePage from './screens/EditProfilePage.js';
-
+import './config/firebase.js';
 
 
 const Stack = createStackNavigator();
